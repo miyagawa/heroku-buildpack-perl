@@ -1,0 +1,39 @@
+#!/bin/sh
+
+indent() {
+  sed -u 's/^/       /'
+}
+
+BUILD_DIR=$1
+CACHE_DIR=$2
+
+PATH="$BUILD_DIR/local/bin:$PATH"
+
+export PERL_MB_OPT="--install_base $BUILD_DIR/local"
+export PERL_MM_OPT="INSTALL_BASE=$BUILD_DIR/local"
+export PERL5LIB="$BUILD_DIR/local/lib/perl5"
+export PERL_CPANM_OPT="--quiet --notest"
+
+rm -rf $BUILD_DIR/local
+if [ -d $CACHE_DIR/local ]; then
+  cp -a $CACHE_DIR/local $BUILD_DIR/local
+fi
+
+cd $BUILD_DIR
+
+if ! [ -e $BUILD_DIR/local/bin/cpanm ]; then
+  echo "-----> Bootstrapping cpanm"
+  curl --silent https://raw.github.com/miyagawa/cpanminus/master/cpanm | perl - App::cpanminus 2>&1 | indent
+fi
+
+echo "-----> Installing dependencies"
+./local/bin/cpanm --installdeps . 2>&1 | indent
+
+echo "-----> Installing Starman"
+./local/bin/cpanm Starman 2>&1 | indent
+
+if [ -d $BUILD_DIR/local ]; then
+  rm -rf $CACHE_DIR/local
+  mkdir -p $CACHE_DIR
+  cp -a $BUILD_DIR/local $CACHE_DIR/local
+fi
