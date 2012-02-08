@@ -9,7 +9,9 @@ Usage
 Example usage:
 
     $ ls
+    Makefile.PL
     app.psgi
+    lib/
 
     $ heroku create --stack cedar --buildpack http://github.com/miyagawa/heroku-buildpack-perl.git
 
