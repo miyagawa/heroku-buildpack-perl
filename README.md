@@ -27,4 +27,4 @@ The buildpack will detect that your app has an `app.psgi` in the root.
 Libraries
 ---------
 
-Dependencies can be declared using either `Makefile.PL` or `Build.PL` (and `cpanfile` in the near future) and the buildpack will install these dependencies using [cpanm](http://cpanmin.us) into `./local` directory.
+Dependencies can be declared using `cpanfile` or traditional `Makefile.PL` and `Build.PL`, and the buildpack will install these dependencies using [cpanm](http://cpanmin.us) into `./local` directory.
