@@ -17,7 +17,7 @@ Example usage:
     requires 'Plack', '1.0000';
     requires 'DBI', '1.6';
 
-    $ heroku create --stack cedar --buildpack http://github.com/miyagawa/heroku-buildpack-perl.git
+    $ heroku create --stack cedar --buildpack https://github.com/miyagawa/heroku-buildpack-perl.git
 
     $ git push heroku master
     ...
@@ -31,4 +31,5 @@ The buildpack will detect that your app has an `app.psgi` in the root.
 Libraries
 ---------
 
-Dependencies can be declared using `cpanfile` or traditional `Makefile.PL` and `Build.PL`, and the buildpack will install these dependencies using [cpanm](http://cpanmin.us) into `./local` directory.
+Dependencies can be declared using `cpanfile` (recommended) or more traditional `Makefile.PL`, `Build.PL` and `META.json` (whichever you can install with `cpanm --installdeps`), and the buildpack will install these dependencies using [cpanm](http://cpanmin.us) into `./local` directory.
+
