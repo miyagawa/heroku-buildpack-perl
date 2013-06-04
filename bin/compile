@@ -13,11 +13,15 @@ export PERL_MB_OPT="--install_base $BUILD_DIR/local"
 export PERL_MM_OPT="INSTALL_BASE=$BUILD_DIR/local"
 export PERL5LIB="$BUILD_DIR/local/lib/perl5"
 export PERL_CPANM_OPT="--quiet --notest"
+export PERL_ARCHNAME=`perl -MConfig -e 'print $Config{archname}'`
 
 rm -rf $BUILD_DIR/local
 if [ -d $CACHE_DIR/local ]; then
   cp -a $CACHE_DIR/local $BUILD_DIR/local
 fi
+
+# fix local::lib + PERL5LIB bootstrap issue
+mkdir -p $BUILD_DIR/local/lib/perl5/$PERL_ARCHNAME
 
 cd $BUILD_DIR
 
