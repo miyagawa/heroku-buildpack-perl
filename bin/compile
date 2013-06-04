@@ -9,19 +9,13 @@ CACHE_DIR=$2
 
 PATH="$BUILD_DIR/local/bin:$PATH"
 
-export PERL_MB_OPT="--install_base $BUILD_DIR/local"
-export PERL_MM_OPT="INSTALL_BASE=$BUILD_DIR/local"
 export PERL5LIB="$BUILD_DIR/local/lib/perl5"
-export PERL_CPANM_OPT="--quiet --notest"
-export PERL_ARCHNAME=`perl -MConfig -e 'print $Config{archname}'`
+export PERL_CPANM_OPT="--quiet --notest -l ./local"
 
 rm -rf $BUILD_DIR/local
 if [ -d $CACHE_DIR/local ]; then
   cp -a $CACHE_DIR/local $BUILD_DIR/local
 fi
-
-# fix local::lib + PERL5LIB bootstrap issue
-mkdir -p $BUILD_DIR/local/lib/perl5/$PERL_ARCHNAME
 
 cd $BUILD_DIR
 
@@ -31,10 +25,10 @@ if ! [ -e $BUILD_DIR/local/bin/cpanm ]; then
 fi
 
 echo "-----> Installing dependencies"
-./local/bin/cpanm --installdeps . 2>&1 | indent
+cpanm --installdeps . 2>&1 | indent
 
 echo "-----> Installing Starman"
-./local/bin/cpanm Starman 2>&1 | indent
+cpanm Starman 2>&1 | indent
 
 if [ -d $BUILD_DIR/local ]; then
   rm -rf $CACHE_DIR/local
