@@ -10,7 +10,7 @@ CACHE_DIR=$2
 PATH="$BUILD_DIR/local/bin:$PATH"
 
 export PERL5LIB="$BUILD_DIR/local/lib/perl5"
-export PERL_CPANM_OPT="--quiet --notest -l ./local"
+export PERL_CPANM_OPT="--quiet --notest -l $BUILD_DIR/local"
 
 rm -rf $BUILD_DIR/local
 if [ -d $CACHE_DIR/local ]; then
