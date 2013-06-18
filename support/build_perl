@@ -1,0 +1,9 @@
+#!/bin/bash
+PERL_VERSION="$1"
+
+cat <<EOF
+git clone git://github.com/tokuhirom/Perl-Build.git /tmp/perl-build
+/tmp/perl-build/perl-build -Duserelocatableinc $PERL_VERSION /tmp/perl/$PERL_VERSION
+
+tar -czf perl-$PERL_VERSION.tgz -C /tmp/perl/$PERL_VERSION .
+EOF
