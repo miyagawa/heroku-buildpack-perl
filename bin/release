@@ -6,5 +6,5 @@ addons:
 config_vars:
   PATH: local/bin:/usr/local/bin:/usr/bin:/bin
 default_process_types:
-  web: perl -Mlib=\$PWD/local/lib/perl5 ./local/bin/starman --preload-app --port \$PORT
+  web: carton exec starman --preload-app --port \$PORT
 EOF

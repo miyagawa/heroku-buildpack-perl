@@ -24,8 +24,11 @@ if ! [ -e $BUILD_DIR/local/bin/cpanm ]; then
   curl --silent https://raw.github.com/miyagawa/cpanminus/master/cpanm | perl - App::cpanminus 2>&1 | indent
 fi
 
-echo "-----> Installing dependencies"
-cpanm --installdeps . 2>&1 | indent
+echo "-----> Installing Carton"
+cpanm --dev Carton
+
+echo "-----> Installing dependencies with Carton"
+carton install --deployment 2>&1 | indent
 
 echo "-----> Installing Starman"
 cpanm Starman 2>&1 | indent
