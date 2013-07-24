@@ -4,34 +4,65 @@ indent() {
   sed -u 's/^/       /'
 }
 
+# because vendored perl is relocatable, shebang is not always correct
+# https://github.com/Perl-Toolchain-Gang/ExtUtils-MakeMaker/issues/38
+fixin_shebang() {
+  for script in $BUILD_DIR/local/bin/*
+  do
+    perl -i -nle 's{^#!.*perl\s*$}{#!/usr/bin/env perl} unless $head++; print' $script
+  done
+}
+
 BUILD_DIR=$1
 CACHE_DIR=$2
 
-PATH="$BUILD_DIR/local/bin:$PATH"
+if [ -e "$BUILD_DIR/.perl-version" ]; then
+  PERL_VERSION=`cat $BUILD_DIR/.perl-version`
+else
+  PERL_VERSION="5.16.3"
+fi
 
-export PERL5LIB="$BUILD_DIR/local/lib/perl5"
-export PERL_CPANM_OPT="--quiet --notest -l $BUILD_DIR/local"
+PERL_PACKAGE="cache.bulknews.net/heroku/perl-$PERL_VERSION.tgz"
+VENDORED_PERL="$BUILD_DIR/vendor/perl"
 
-rm -rf $BUILD_DIR/local
-if [ -d $CACHE_DIR/local ]; then
-  cp -a $CACHE_DIR/local $BUILD_DIR/local
+echo "-----> Vendoring Perl"
+mkdir -p $VENDORED_PERL && curl $PERL_PACKAGE -s -o - | tar xzf - -C $VENDORED_PERL
+
+export PATH="$BUILD_DIR/local/bin:$VENDORED_PERL/bin:$PATH"
+
+echo "Using perl $PERL_VERSION" | indent
+
+LOCAL_DEPS="$BUILD_DIR/local"
+CACHE_DEPS="$CACHE_DIR/$PERL_VERSION/local"
+
+export PERL5LIB="$LOCAL_DEPS/lib/perl5"
+export PERL_CPANM_OPT="--quiet --notest -l $LOCAL_DEPS"
+
+rm -rf $LOCAL_DEPS
+if [ -d $CACHE_DEPS ]; then
+  cp -R "$CACHE_DEPS" "$LOCAL_DEPS"
 fi
 
 cd $BUILD_DIR
 
-if ! [ -e $BUILD_DIR/local/bin/cpanm ]; then
-  echo "-----> Bootstrapping cpanm"
-  curl --silent https://raw.github.com/miyagawa/cpanminus/master/cpanm | perl - App::cpanminus 2>&1 | indent
+# TODO pre-build extras for each perl to speed up
+if ! [ -e $LOCAL_DEPS/bin/carton ]; then
+  echo "-----> Bootstrapping cpanm/Carton"
+  curl --silent https://raw.github.com/miyagawa/cpanminus/master/cpanm | perl - App::cpanminus Carton@0.9.59 2>&1 | indent
+  fixin_shebang
 fi
 
-echo "-----> Installing dependencies"
-cpanm --installdeps . 2>&1 | indent
+echo "-----> Installing dependencies with Carton"
+carton install --deployment 2>&1 | indent
 
+# TODO support different server type via Procfile
 echo "-----> Installing Starman"
 cpanm Starman 2>&1 | indent
 
-if [ -d $BUILD_DIR/local ]; then
-  rm -rf $CACHE_DIR/local
-  mkdir -p $CACHE_DIR
-  cp -a $BUILD_DIR/local $CACHE_DIR/local
+fixin_shebang
+
+if [ -d "$LOCAL_DEPS" ]; then
+  rm -rf "$CACHE_DEPS"
+  mkdir -p "$CACHE_DIR/$PERL_VERSION"
+  cp -R "$LOCAL_DEPS" "$CACHE_DEPS"
 fi
