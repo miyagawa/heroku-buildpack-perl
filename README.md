@@ -16,8 +16,8 @@ Example usage:
     requires 'DBI', '1.6';
 
     $ carton install
-    $ git add carton.lock
-    $ git commit -m 'bundle carton.lock'
+    $ git add cpanfile.snapshot
+    $ git commit -m 'bundle cpanfile.snapshot'
 
     $ heroku create --stack cedar --buildpack https://github.com/miyagawa/heroku-buildpack-perl.git#carton
 
