@@ -21,7 +21,7 @@ cd $BUILD_DIR
 
 if ! [ -e $BUILD_DIR/local/bin/cpanm ]; then
   echo "-----> Bootstrapping cpanm"
-  curl --silent https://raw.github.com/miyagawa/cpanminus/master/cpanm | perl - App::cpanminus 2>&1 | indent
+  curl -L --silent https://raw.github.com/miyagawa/cpanminus/master/cpanm | perl - App::cpanminus 2>&1 | indent
 fi
 
 echo "-----> Installing dependencies"
