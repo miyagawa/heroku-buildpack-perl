@@ -37,6 +37,7 @@ if ! [ -e $BUILD_DIR/local/bin/cpanm ]; then
 fi
 
 echo "-----> Installing dependencies"
+echo "cpanm options: $PERL_CPANM_OPT" | indent
 cpanm --installdeps . 2>&1 | indent
 
 echo "-----> Installing Starman"
