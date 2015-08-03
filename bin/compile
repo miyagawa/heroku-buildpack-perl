@@ -1,4 +1,10 @@
-#!/bin/sh
+#!/usr/bin/env bash
+# Usage:
+#
+#     $ bin/compile <build-dir> <cache-dir> <env-path>
+
+# Fail fast and fail hard.
+set -eo pipefail
 
 indent() {
   sed -u 's/^/       /'
@@ -6,11 +12,17 @@ indent() {
 
 BUILD_DIR=$1
 CACHE_DIR=$2
+ENV_DIR=$3
 
 PATH="$BUILD_DIR/local/bin:$PATH"
 
 export PERL5LIB="$BUILD_DIR/local/lib/perl5"
-export PERL_CPANM_OPT="--quiet --notest -l $BUILD_DIR/local"
+
+PERL_CPANM_OPT="--quiet --notest -l $BUILD_DIR/local"
+if [ -f $ENV_DIR/PERL_CPANM_OPT ]; then
+  PERL_CPANM_OPT="$PERL_CPANM_OPT $(cat $ENV_DIR/PERL_CPANM_OPT)"
+fi
+export PERL_CPANM_OPT
 
 rm -rf $BUILD_DIR/local
 if [ -d $CACHE_DIR/local ]; then
@@ -25,6 +37,7 @@ if ! [ -e $BUILD_DIR/local/bin/cpanm ]; then
 fi
 
 echo "-----> Installing dependencies"
+echo "cpanm options: $PERL_CPANM_OPT" | indent
 cpanm --installdeps . 2>&1 | indent
 
 echo "-----> Installing Starman"
