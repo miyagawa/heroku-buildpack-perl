@@ -14,8 +14,8 @@ Example usage:
     lib/
 
     $ cat cpanfile
+    requires 'Starman', '0.3011';
     requires 'Plack', '1.0000';
-    requires 'DBI', '1.6';
 
     $ heroku create --stack cedar --buildpack https://github.com/miyagawa/heroku-buildpack-perl.git
 
